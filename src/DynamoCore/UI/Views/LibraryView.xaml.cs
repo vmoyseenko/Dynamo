@@ -28,7 +28,7 @@ namespace Dynamo.UI.Views
             var classButton = sender as ListViewItem;
             if ((classButton == null) || !classButton.IsSelected)
             {
-                LibraryWrapPanel.SelectedItem = classButton.Content as BrowserInternalElement;
+                LibraryWrapPanel.AssumedItem = classButton.Content as BrowserInternalElement;
                 return;
             }
 

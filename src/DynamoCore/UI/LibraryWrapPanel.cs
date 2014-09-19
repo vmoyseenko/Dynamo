@@ -19,7 +19,8 @@ namespace Dynamo.Controls
         private ObservableCollection<BrowserItem> collection;
         private BrowserInternalElement currentClass;
 
-        public static BrowserInternalElement SelectedItem;
+        //Item, that must be clicked be user.
+        public static BrowserInternalElement AssumedItem;
 
         protected override void OnInitialized(EventArgs e)
         {
@@ -105,13 +106,14 @@ namespace Dynamo.Controls
         {
             var index = ((sender as ListView).SelectedIndex);
             int classInfoIndex = GetClassInformationIndex();
-;
-            //Something went wrong, they must be the same.
-            if ((SelectedItem != (sender as ListView).SelectedItem) && (SelectedItem != null))
+
+            // Something went wrong, AssumedItem and SelectedItem must be the same.
+            // It occurs sometimes, when button,under selected button, was clicked. 
+            if ((AssumedItem != null) && (AssumedItem != (sender as ListView).SelectedItem))
             {
                 foreach (var item in collection)
                 {
-                    if (item as BrowserInternalElement == SelectedItem)
+                    if (item as BrowserInternalElement == AssumedItem)
                     {
                         index = collection.IndexOf(item);
                         (sender as ListView).SelectedIndex = index;
