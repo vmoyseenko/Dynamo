@@ -19,6 +19,8 @@ namespace Dynamo.Controls
         private ObservableCollection<BrowserItem> collection;
         private BrowserInternalElement currentClass;
 
+        public static BrowserInternalElement SelectedItem;
+
         protected override void OnInitialized(EventArgs e)
         {
             // ListView should never be null.
@@ -103,6 +105,20 @@ namespace Dynamo.Controls
         {
             var index = ((sender as ListView).SelectedIndex);
             int classInfoIndex = GetClassInformationIndex();
+;
+            //Something went wrong, they must be the same.
+            if ((SelectedItem != (sender as ListView).SelectedItem) && (SelectedItem != null))
+            {
+                foreach (var item in collection)
+                {
+                    if (item as BrowserInternalElement == SelectedItem)
+                    {
+                        index = collection.IndexOf(item);
+                        (sender as ListView).SelectedIndex = index;
+                        break;
+                    }
+                }
+            }
 
             // If user clicks on the same item when it is expanded, then 'OnClassButtonCollapse'
             // is invoked to deselect the item. This causes 'OnClassViewSelectionChanged' to be 
