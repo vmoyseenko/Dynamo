@@ -6,6 +6,7 @@
              xmlns:controls="clr-namespace:Dynamo.Controls"
              xmlns:uicontrols="clr-namespace:Dynamo.UI.Controls"
              xmlns:ui="clr-namespace:Dynamo.UI"
+             xmlns:search="clr-namespace:Dynamo.Nodes.Search"
              mc:Ignorable="d"
              d:DesignHeight="525"
              d:DesignWidth="350">
@@ -73,12 +74,43 @@
                 </Grid>
             </DataTemplate>
 
+            <HierarchicalDataTemplate x:Key="NestedClassesTemplate"
+                                      DataType="{x:Type search:BrowserInternalElement}"
+                                      ItemsSource="{Binding Path=Items}">
+                <Border Height="30">
+                    <TextBlock Foreground="#DDD"
+                               FontSize="13"
+                               Text="{Binding Path=Name}"
+                               VerticalAlignment="Center" />
+                </Border>
+            </HierarchicalDataTemplate>
+
             <controls:ClassObjectTemplateSelector x:Key="ClassObjectTemplateSelector"
                                                   ClassObjectTemplate="{StaticResource ClassObjectDataTemplate}"
-                                                  ClassDetailsTemplate="{StaticResource ClassDetailsDataTemplate}" />
+                                                  ClassDetailsTemplate="{StaticResource ClassDetailsDataTemplate}"
+                                                  NestedClassesTemplate="{StaticResource NestedClassesTemplate}"/>
             <!-- This data template is used to show the list of subcategories. -->
             <DataTemplate x:Key="SubclassesTemplate">
-                <ListView Name="SubCategoryListView"
+                <TreeView ItemsSource="{Binding Path=Items}"
+                          ItemTemplateSelector="{StaticResource ClassObjectTemplateSelector}">
+                    <TreeView.Template>
+                        <ControlTemplate>
+                            <ItemsPresenter />
+                        </ControlTemplate>
+                    </TreeView.Template>
+                    <TreeView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <controls:LibraryWrapPanel Background="Transparent"
+                                                       Margin="0,10,0,10">
+                                <controls:LibraryWrapPanel.Width>
+                                    <Binding Path="ActualWidth"
+                                             ElementName="CategoryListView" />
+                                </controls:LibraryWrapPanel.Width>
+                            </controls:LibraryWrapPanel>
+                        </ItemsPanelTemplate>
+                    </TreeView.ItemsPanel>
+                </TreeView>
+                <!--<ListView Name="SubCategoryListView"
                           ItemTemplateSelector="{StaticResource ClassObjectTemplateSelector}"
                           Background="#2F2F2F"
                           BorderThickness="0"
@@ -149,7 +181,7 @@
 
                         </Style>
                     </ListView.ItemContainerStyle>
-                </ListView>
+                </ListView>-->
             </DataTemplate>
 
             <controls:SubclassesTemplateSelector x:Key="SubclassesTemplateSelector"

@@ -22,10 +22,11 @@ namespace Dynamo.Controls
         protected override void OnInitialized(EventArgs e)
         {
             // ListView should never be null.
-            var classListView = WPF.FindUpVisualTree<ListView>(this);
+            var classListView = WPF.FindUpVisualTree<TreeView>(this);
             collection = classListView.ItemsSource as ObservableCollection<BrowserItem>;
+            if (collection == null) return;
             collection.Add(new ClassInformation());
-            classListView.SelectionChanged += OnClassViewSelectionChanged;
+            //classListView.SelectionChanged += OnClassViewSelectionChanged;
 
             base.OnInitialized(e);
         }
