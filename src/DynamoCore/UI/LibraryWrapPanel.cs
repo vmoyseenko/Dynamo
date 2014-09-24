@@ -22,11 +22,16 @@ namespace Dynamo.Controls
         protected override void OnInitialized(EventArgs e)
         {
             // ListView should never be null.
-            var classListView = WPF.FindUpVisualTree<TreeView>(this);
-            collection = classListView.ItemsSource as ObservableCollection<BrowserItem>;
+            var classTreeView = WPF.FindUpVisualTree<TreeView>(this);
+            //foreach (FrameworkElement child in Children)
+            //    collection.Add(child.DataContext as BrowserItem)
+            
+            foreach (var item in classTreeView.ItemsSource)
+                collection = (item as BrowserInternalElement).Items;
+
             if (collection == null) return;
             collection.Add(new ClassInformation());
-            //classListView.SelectionChanged += OnClassViewSelectionChanged;
+            classTreeView.SelectedItemChanged += OnClassViewSelectionChanged;
 
             base.OnInitialized(e);
         }
@@ -100,9 +105,16 @@ namespace Dynamo.Controls
             get { return false; } // Arrange items in two dimension.
         }
 
-        private void OnClassViewSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnClassViewSelectionChanged(object sender, RoutedPropertyChangedEventArgs<Object> e)
         {
-            var index = ((sender as ListView).SelectedIndex);
+            Int32 index = 0;
+            foreach (var _item in collection)
+            {
+                if (_item == (sender as TreeView).SelectedItem)
+                    break;
+                index++;
+            }
+
             int classInfoIndex = GetClassInformationIndex();
 
             // If user clicks on the same item when it is expanded, then 'OnClassButtonCollapse'
