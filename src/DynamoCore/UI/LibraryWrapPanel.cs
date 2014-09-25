@@ -22,7 +22,6 @@ namespace Dynamo.Controls
         protected override void OnInitialized(EventArgs e)
         {
             // ListView should never be null.
-
             var classListView = WPF.FindUpVisualTree<ListView>(this);
             collection = classListView.ItemsSource as ObservableCollection<BrowserItem>;
             if (collection == null) return;
