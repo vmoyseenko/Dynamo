@@ -21,25 +21,9 @@ namespace Dynamo.Controls
 
         protected override void OnInitialized(EventArgs e)
         {
-            // ListView of TreeView should never be null.
+            // ListView should never be null.
 
-            //var classTreeView = WPF.FindUpVisualTree<TreeView>(this);
             var classListView = WPF.FindUpVisualTree<ListView>(this);
-
-            //if (classTreeView != null)
-            //{
-
-            //    foreach (var item in classTreeView.ItemsSource)
-            //        collection = (item as BrowserInternalElement).Items;
-
-            //    if (collection == null) return;
-            //    collection.Add(new ClassInformation());
-            //    classTreeView.SelectedItemChanged += OnClassTreeViewSelectionChanged;
-
-            //    base.OnInitialized(e);
-            //    return;
-            //}
-
             collection = classListView.ItemsSource as ObservableCollection<BrowserItem>;
             if (collection == null) return;
             collection.Add(new ClassInformation());
@@ -117,30 +101,9 @@ namespace Dynamo.Controls
             get { return false; } // Arrange items in two dimension.
         }
 
-        private void OnClassTreeViewSelectionChanged(object sender, RoutedPropertyChangedEventArgs<Object> e)
-        {
-            Int32 index = 0;
-            bool itemWasFound = false;
-            foreach (var _item in collection)
-            {
-                if (_item == (sender as TreeView).SelectedItem)
-                {
-                    itemWasFound = true;
-                    break;
-                }
-                index++;
-            }
-            if(itemWasFound) SelectionChanged(index);
-        }
-
         private void OnClassListViewSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var index = ((sender as ListView).SelectedIndex);
-            SelectionChanged(index);
-        }
-
-        private void SelectionChanged(int index)
-        {
             int classInfoIndex = GetClassInformationIndex();
 
             // If user clicks on the same item when it is expanded, then 'OnClassButtonCollapse'

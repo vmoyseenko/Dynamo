@@ -559,7 +559,6 @@ namespace Dynamo.Search
 
                 foreach (var function in functions)
                 {
-
                     //Don't add the functions that are not visible in library.
                     if (!function.IsVisibleInLibrary)
                         continue;

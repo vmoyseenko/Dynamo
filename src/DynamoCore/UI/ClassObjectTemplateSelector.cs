@@ -16,14 +16,10 @@ namespace Dynamo.Controls
                 return ClassDetailsTemplate;
 
             if (item is BrowserItem)
-            {
                 return ClassObjectTemplate;
-            }
 
             const string message = "Unknown object bound to collection";
             throw new InvalidOperationException(message);
-        }
-
-        
+        }       
     }
 }
