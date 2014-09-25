@@ -24,9 +24,8 @@ namespace Dynamo.Controls
             // ListView should never be null.
             var classListView = WPF.FindUpVisualTree<ListView>(this);
             collection = classListView.ItemsSource as ObservableCollection<BrowserItem>;
-            if (collection == null) return;
             collection.Add(new ClassInformation());
-            classListView.SelectionChanged += OnClassListViewSelectionChanged;
+            classListView.SelectionChanged += OnClassViewSelectionChanged;
 
             base.OnInitialized(e);
         }
@@ -100,7 +99,7 @@ namespace Dynamo.Controls
             get { return false; } // Arrange items in two dimension.
         }
 
-        private void OnClassListViewSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnClassViewSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var index = ((sender as ListView).SelectedIndex);
             int classInfoIndex = GetClassInformationIndex();
