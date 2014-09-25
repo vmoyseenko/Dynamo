@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Dynamo.Models;
+using Dynamo.Nodes.Search;
+using Dynamo.Search.SearchElements;
 using Dynamo.Services;
 using Dynamo.Utilities;
 using System.Globalization;
@@ -16,6 +18,8 @@ using System.IO;
 using Dynamo.UI;
 using System.Web;
 using System.Text;
+using Dynamo.Library;
+using Dynamo.DSEngine;
 
 namespace Dynamo.Nodes
 {
@@ -139,6 +143,51 @@ namespace Dynamo.Nodes
             {
                 return value.Remove(desiredLength - 1) + "...";
             }
+        }
+
+        /// <summary>
+        /// This method returns a name for the icon based on type of this icon.
+        /// </summary>
+        /// <param name="descriptor"></param>
+        /// <returns></returns>
+        public static string TypedParametersToString(FunctionDescriptor descriptor)
+        {
+            var builder = new StringBuilder();
+
+            foreach (TypedParameter tp in descriptor.Parameters)
+            {
+                string typeOfParameter = tp.Type;
+
+                // Check if there simbols like "[]".
+                // And remove them, according how much we found.
+                // e.g. bool[][] -> bool2
+                int squareBrackets = typeOfParameter.Count(x => x == '[');
+                if (squareBrackets > 0)
+                {
+                    if (typeOfParameter.Contains("[]..[]"))
+                    {
+                        // Remove square brackets.
+                        typeOfParameter = typeOfParameter.Replace("[]..[]", "");
+                        // Add number of them.
+                        typeOfParameter = String.Concat(typeOfParameter, "N");
+                    }
+                    else
+                    {
+                        // Remove square brackets.
+                        typeOfParameter =
+                            typeOfParameter.Remove(typeOfParameter.Length - squareBrackets * 2);
+                        // Add number of them.
+                        typeOfParameter = String.Concat(typeOfParameter, squareBrackets.ToString());
+                    }
+                }
+
+                if (builder.Length > 0)
+                    builder.Append("-");
+
+                builder.Append(typeOfParameter);
+            }
+
+            return descriptor.QualifiedName + "." + builder.ToString();
         }
 
         /// <summary>
@@ -675,6 +724,31 @@ namespace Dynamo.Nodes
 
             var result = newText.ToString();
             return ((result == "-") ? string.Empty : result);
+        }
+
+
+        /// <summary>
+        /// Find out is element consits of nested classes or not.
+        /// </summary>
+        /// <param name="rootElement">Element, that needs to be checked.</param>
+        /// <returns></returns>
+        internal static bool ConsistOfNestedClasses(BrowserItem rootElement)
+        {
+            // Go deeper in item for 2 levels. 1st level - class button,
+            // 2nd level - class member.
+            // E.g. 1st lvl - Color, 2nd lvl - Red.
+            // But for nested classes 2nd lvl will be BrowserInternalElement,
+            // That's how we know whether it is nested structure or not.
+            foreach (var classItem in rootElement.Items)
+            {
+                foreach (var classMember in classItem.Items)
+                {
+                    if (classMember is SearchElementBase) continue;
+                    else return true;
+                }
+            }
+
+            return false;
         }
     }
 
