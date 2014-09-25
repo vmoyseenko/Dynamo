@@ -227,6 +227,7 @@ limitations under the License.
       <SubType>Code</SubType>
       <DependentUpon>GenericTaskDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\TreeViewItemStyleSelector .cs" />
     <Compile Include="UI\Views\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
