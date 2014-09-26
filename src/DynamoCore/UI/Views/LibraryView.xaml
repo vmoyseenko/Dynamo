@@ -310,6 +310,14 @@
 
             <!--EndRegion-->
 
+            <!-- Region TemplateSelectors -->
+            <controls:NestedClassesTemplateSelector x:Key="NestedClassesTemplateSelector"
+                                                    NestedClassesTemplate="{StaticResource NestedClassesTemplate}"
+                                                    SubclassesTemplate="{StaticResource SubclassesTemplate}"
+                                                    ClassDetailsTemplate="{StaticResource ClassDetailsDataTemplate}" />
+            <!--EndRegion-->
+            
+            <!-- Region Styles -->
             <Style x:Key="ExpandCollapseToggleStyle"
                    TargetType="{x:Type ToggleButton}">
                 <Setter Property="Focusable"
@@ -489,7 +497,6 @@
                                         </Grid>
 
                                         <Border Grid.Column="0"
-
                                                 Grid.Row="1">
                                             <ItemsPresenter x:Name="ItemsHost" />
                                         </Border>
@@ -537,7 +544,6 @@
                 </Setter>
             </Style>
 
-            <!-- Region TreeView -->
             <Style x:Key="LibraryTreeView"
                    TargetType="{x:Type TreeView}">
                 <Setter Property="Focusable"
@@ -557,51 +563,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-
-            <!--EndRegion-->
-
-            <!-- Region TemplateSelectors -->
-            <controls:NestedClassesTemplateSelector x:Key="NestedClassesTemplateSelector"
-                                                    NestedClassesTemplate="{StaticResource NestedClassesTemplate}"
-                                                    SubclassesTemplate="{StaticResource SubclassesTemplate}"
-                                                    ClassDetailsTemplate="{StaticResource ClassDetailsDataTemplate}" />
-            <!--EndRegion-->
-
-            <!-- Region Scrollbar -->
-            <ControlTemplate x:Key="ScrollViewerControlTemplate"
-                             TargetType="{x:Type ScrollViewer}">
-                <Grid x:Name="Grid"
-                      Background="{TemplateBinding Background}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
-                                            CanContentScroll="{TemplateBinding CanContentScroll}"
-                                            CanHorizontallyScroll="False"
-                                            CanVerticallyScroll="True"
-                                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                                            Content="{TemplateBinding Content}"
-                                            Grid.RowSpan="2"
-                                            Margin="{TemplateBinding Padding}"
-                                            Grid.ColumnSpan="2" />
-                    <ScrollBar x:Name="PART_VerticalScrollBar"
-                               AutomationProperties.AutomationId="VerticalScrollBar"
-                               Cursor="Arrow"
-                               Grid.Column="1"
-                               Maximum="{TemplateBinding ScrollableHeight}"
-                               Minimum="0"
-                               Grid.Row="0"
-                               Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
-                               Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
-                               ViewportSize="{TemplateBinding ViewportHeight}"
-                               Width="8" />
-                </Grid>
-            </ControlTemplate>
 
             <Style x:Key="VerticalThumb"
                    TargetType="{x:Type Thumb}">
@@ -708,6 +669,44 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+            <!--EndRegion-->
+
+            <!-- Region Scrollbar -->
+            <ControlTemplate x:Key="ScrollViewerControlTemplate"
+                             TargetType="{x:Type ScrollViewer}">
+                <Grid x:Name="Grid"
+                      Background="{TemplateBinding Background}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
+                                            CanContentScroll="{TemplateBinding CanContentScroll}"
+                                            CanHorizontallyScroll="False"
+                                            CanVerticallyScroll="True"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            Content="{TemplateBinding Content}"
+                                            Grid.RowSpan="2"
+                                            Margin="{TemplateBinding Padding}"
+                                            Grid.ColumnSpan="2" />
+                    <ScrollBar x:Name="PART_VerticalScrollBar"
+                               AutomationProperties.AutomationId="VerticalScrollBar"
+                               Cursor="Arrow"
+                               Grid.Column="1"
+                               Maximum="{TemplateBinding ScrollableHeight}"
+                               Minimum="0"
+                               Grid.Row="0"
+                               Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                               Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                               ViewportSize="{TemplateBinding ViewportHeight}"
+                               Width="8" />
+                </Grid>
+            </ControlTemplate>
+
             <!--EndRegion-->
 
         </ResourceDictionary>

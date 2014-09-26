@@ -13,6 +13,7 @@ namespace Dynamo.Controls
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
+            // TODO: That won't work for categories like "Operators" or 'BuiltIn Functions". Need another logic.
             if (item is ClassInformation)
                 return ClassDetailsTemplate;
 
