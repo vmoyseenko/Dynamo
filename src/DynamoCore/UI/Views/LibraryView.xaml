@@ -192,13 +192,12 @@
             <!-- This data template is used to show StandardPanel
                  for some selected subcategory. -->
             <DataTemplate x:Key="ClassDetailsDataTemplate">
-                <Grid Background="#272727">
-                    <Grid.Width>
+                <uicontrols:StandardPanel>
+                    <uicontrols:StandardPanel.Width>
                         <Binding Path="ActualWidth"
                                  RelativeSource="{RelativeSource FindAncestor, AncestorType=ListView}" />
-                    </Grid.Width>
-                    <uicontrols:StandardPanel Name="standardPanel" />
-                </Grid>
+                    </uicontrols:StandardPanel.Width>
+                </uicontrols:StandardPanel>
             </DataTemplate>
 
             <controls:ClassObjectTemplateSelector x:Key="ClassObjectTemplateSelector"
@@ -731,22 +730,6 @@
                         <ItemsPresenter />
                     </ControlTemplate>
                 </TreeView.Template>
-                <!--<TreeView.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
-                        <Setter Property="Background"
-                                Value="Transparent" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type TreeViewItem}">
-                                    <Border BorderThickness="0,0,0,1"
-                                            BorderBrush="#2F2F2F">
-                                        <ContentPresenter />
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </TreeView.ItemContainerStyle>-->
             </TreeView>
         </ScrollViewer>
     </Grid>
