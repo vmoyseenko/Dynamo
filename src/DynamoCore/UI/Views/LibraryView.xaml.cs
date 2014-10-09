@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -78,8 +79,10 @@ namespace Dynamo.UI.Views
         // Here we can move left, right, down.
         private void OnClassButtonKeyDown(object sender, KeyEventArgs e)
         {
-            var listViewItem = sender as ListViewItem;
-            var listView = Dynamo.Utilities.WPF.FindUpVisualTree<ListView>(listViewItem);
+            var classButton = sender as ListViewItem;
+            var listViewButtons = Dynamo.Utilities.WPF.FindUpVisualTree<ListView>(classButton);
+            var selectedIndex = listViewButtons.SelectedIndex;
+            int itemsPerRow = (int)Math.Floor(listViewButtons.ActualWidth / classButton.ActualWidth);
 
             switch (e.Key)
             {
