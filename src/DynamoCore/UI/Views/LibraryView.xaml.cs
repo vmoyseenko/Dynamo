@@ -78,7 +78,24 @@ namespace Dynamo.UI.Views
         // Here we can move left, right, down.
         private void OnClassButtonKeyDown(object sender, KeyEventArgs e)
         {
-            
+            var listViewItem = sender as ListViewItem;
+            var listView = Dynamo.Utilities.WPF.FindUpVisualTree<ListView>(listViewItem);
+
+            switch (e.Key)
+            {
+                case Key.Right:
+                    {
+                        return;
+                    }
+                case Key.Left:
+                    {
+                        return;
+                    }
+                case Key.Down:
+                    {
+                        return;
+                    }
+            }
         }
 
         // Here we can move just up.
@@ -86,5 +103,6 @@ namespace Dynamo.UI.Views
         {
             
         }
+
     }
 }
