@@ -74,5 +74,17 @@ namespace Dynamo.UI.Views
             if (buttons != null)
                 buttons.UnselectAll();
         }
+
+        // Here we can move left, right, down.
+        private void OnClassButtonKeyDown(object sender, KeyEventArgs e)
+        {
+            
+        }
+
+        // Here we can move just up.
+        private void OnClassButtonKeyUp(object sender, KeyEventArgs e)
+        {
+            
+        }
     }
 }

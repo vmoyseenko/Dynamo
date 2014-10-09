@@ -244,6 +244,10 @@
 
                             <EventSetter Event="PreviewMouseLeftButtonDown"
                                          Handler="OnClassButtonCollapse" />
+                            <EventSetter Event="KeyDown"
+                                         Handler="OnClassButtonKeyDown" />
+                            <EventSetter Event="KeyUp"
+                                         Handler="OnClassButtonKeyUp" />
 
                             <Setter Property="Template">
                                 <Setter.Value>
