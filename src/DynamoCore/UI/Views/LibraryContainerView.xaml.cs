@@ -102,7 +102,7 @@ namespace Dynamo.Search
                 ClearSearchBox();
             }
         }
-
+               
         private void OnSearchBoxPreviewKeyDown(object sender, KeyEventArgs e)
         {
             bool handleIt = false;
@@ -329,6 +329,16 @@ namespace Dynamo.Search
                 else
                     viewModel.SearchIconAlignment = System.Windows.HorizontalAlignment.Left;
             }
+        }
+
+        private void OnSearchTextBoxKeyUp(object sender, KeyEventArgs e)
+        {
+            // Go down to results tree.
+            if (e.Key == Key.Down)
+            {
+                WPF.FindChild<ListBox>(this, "topResultListBox").Focus();
+            }
+
         }
     }
 }

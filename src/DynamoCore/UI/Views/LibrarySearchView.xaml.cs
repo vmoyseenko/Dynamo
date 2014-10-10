@@ -4,6 +4,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 ﻿using Dynamo.Search.SearchElements;
 using Dynamo.ViewModels;
+using Dynamo.Search;
+using Dynamo.Utilities;
 
 namespace Dynamo.UI.Views
 {
@@ -110,5 +112,47 @@ namespace Dynamo.UI.Views
             }
             return newIndex;
         }
+
+        // Here we can move up and down.
+        private void MethodButtonKeyDown(object sender, KeyEventArgs e)
+        {
+            // Case 1. We are on top result now and press Down.
+            if (sender is ListBox)
+                if ((sender as ListBox).Name == "topResultListBox")
+                    if (e.Key == Key.Down)
+                    {
+                        if ((this.DataContext as SearchViewModel).Model.SearchRootCategories.Count == 0) return;
+
+                        // Find first category.
+                        var foundCategories = WPF.FindChild<ListView>(this, "CategoryListView");
+                        var firstCategory = foundCategories.ItemContainerGenerator.ContainerFromIndex(0) as ListViewItem;
+
+                        // Find first class of first category.
+                        var firstCatClasses = WPF.FindChild<ListView>(firstCategory, "SubCategoryListView");
+                        if (firstCatClasses.Items.Count > 0)
+                        {
+                            // Set Focus on first class of category.
+                            (firstCatClasses.ItemContainerGenerator.ContainerFromIndex(0) as ListViewItem).Focus();
+                            e.Handled = true;
+                            return;
+                        }
+                        // If category doesn't consist of classes, then we set focus on first method member.
+                        else
+                        {
+                            var firstCatMemberGroup = WPF.FindChild<ListBox>(firstCategory, "MemberGroupsListBox");
+                            if (firstCatMemberGroup.Items.Count > 0)
+                            {
+                                var members = WPF.FindChild<ListBox>(firstCatMemberGroup, "MembersListBox");
+                                // Set Focus on first member of member group.
+                                var firstMember = members.ItemContainerGenerator.ContainerFromIndex(0) as ListBoxItem;
+                                firstMember.Focus();
+                                e.Handled = true;
+                                return;
+                            }
+                        }
+                    }
+
+        }
+
     }
 }
