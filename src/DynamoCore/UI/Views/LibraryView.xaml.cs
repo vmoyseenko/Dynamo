@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -75,6 +74,5 @@ namespace Dynamo.UI.Views
             if (buttons != null)
                 buttons.UnselectAll();
         }
-
     }
 }
