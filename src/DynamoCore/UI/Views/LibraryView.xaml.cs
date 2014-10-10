@@ -76,7 +76,7 @@ namespace Dynamo.UI.Views
                 buttons.UnselectAll();
         }
 
-        // Here we can move left, right, down.
+        // Here we can move left, right, up, down.
         private void OnClassButtonKeyDown(object sender, KeyEventArgs e)
         {
             var classButton = sender as ListViewItem;
@@ -84,27 +84,53 @@ namespace Dynamo.UI.Views
             var selectedIndex = listViewButtons.SelectedIndex;
             int itemsPerRow = (int)Math.Floor(listViewButtons.ActualWidth / classButton.ActualWidth);
 
-            switch (e.Key)
+            int newIndex = GetIndexNextSelectedItem(e.Key, selectedIndex, itemsPerRow);
+
+            if ((newIndex >= 0) && (newIndex < listViewButtons.Items.Count))
+                listViewButtons.SelectedIndex = newIndex;
+
+            // Set focus on new selected item.
+            var item = listViewButtons.ItemContainerGenerator.ContainerFromIndex(listViewButtons.SelectedIndex) as ListViewItem;
+            item.Focus();
+
+            e.Handled = true;
+            return;
+        }
+
+        private int GetIndexNextSelectedItem(Key key, int selectedIndex, int itemsPerRow)
+        {
+            int newIndex = -1;
+            int numberOfSelectedRow = selectedIndex / itemsPerRow + 1;
+
+            switch (key)
             {
                 case Key.Right:
                     {
-                        return;
+                        newIndex = selectedIndex + 1;
+                        int availableIndex = numberOfSelectedRow * itemsPerRow - 1;
+                        if (newIndex > availableIndex) newIndex = selectedIndex;
+                        break;
                     }
                 case Key.Left:
                     {
-                        return;
+                        newIndex = selectedIndex - 1;
+                        int availableIndex = (numberOfSelectedRow - 1) * itemsPerRow;
+                        if (newIndex < availableIndex) newIndex = selectedIndex;
+                        break;
                     }
                 case Key.Down:
                     {
-                        return;
+                        newIndex = selectedIndex + itemsPerRow + 1;
+                        // +1 because one of items is always ClassInformation.
+                        break;
+                    }
+                case Key.Up:
+                    {
+                        newIndex = selectedIndex - itemsPerRow;
+                        break;
                     }
             }
-        }
-
-        // Here we can move just up.
-        private void OnClassButtonKeyUp(object sender, KeyEventArgs e)
-        {
-            
+            return newIndex;
         }
 
     }
