@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Dynamo.ViewModels;
 using Dynamo.Search;
 using Dynamo.Utilities;
+using Dynamo.Nodes.Search;
 
 namespace Dynamo.UI.Views
 {
@@ -60,17 +61,17 @@ namespace Dynamo.UI.Views
         private void OnClassButtonKeyDown(object sender, KeyEventArgs e)
         {
             var classButton = sender as ListViewItem;
-            var listViewButtons = Dynamo.Utilities.WPF.FindUpVisualTree<ListView>(classButton);
-            var selectedIndex = listViewButtons.SelectedIndex;
+            var listViewButtons = WPF.FindUpVisualTree<ListView>(classButton);
+            var selectedIndex = listViewButtons.Items.IndexOf((sender as FrameworkElement).DataContext);
             int itemsPerRow = (int)Math.Floor(listViewButtons.ActualWidth / classButton.ActualWidth);
 
             int newIndex = GetIndexNextSelectedItem(e.Key, selectedIndex, itemsPerRow);
 
-            if ((newIndex >= 0) && (newIndex < listViewButtons.Items.Count))
-                listViewButtons.SelectedIndex = newIndex;
+            if ((newIndex < 0) || (newIndex > listViewButtons.Items.Count)) return;
+            //    listViewButtons.SelectedIndex = newIndex;
 
             // Set focus on new selected item.
-            var item = listViewButtons.ItemContainerGenerator.ContainerFromIndex(listViewButtons.SelectedIndex) as ListViewItem;
+            var item = listViewButtons.ItemContainerGenerator.ContainerFromIndex(newIndex) as ListViewItem;
             item.Focus();
 
             e.Handled = true;
@@ -151,7 +152,18 @@ namespace Dynamo.UI.Views
                             }
                         }
                     }
-        }
 
+            // Case 2. We are inside of any member group, but not top result.
+            if (sender is ListBox)
+            {
+                if (e.Key == Key.Down)
+                // That means we need to set focus to next member group from the same category.
+                // Or move to next category.
+                {
+
+                }
+                // var listBoxMemberGroup = WPF.FindUpVisualTree<ListView>(sender is ListBox);
+            }
+        }
     }
 }
