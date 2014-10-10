@@ -1,4 +1,4 @@
-﻿using Dynamo.Search.SearchElements;
+﻿﻿using Dynamo.Search.SearchElements;
 using Dynamo.ViewModels;
 using System;
 using System.Windows;
