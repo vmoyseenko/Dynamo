@@ -1,4 +1,7 @@
 ﻿using Dynamo.Search.SearchElements;
+using Dynamo.ViewModels;
+using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -43,6 +46,14 @@ namespace Dynamo.UI.Views
             e.Handled = true;
         }
 
+        private void OnNoMatchFoundButtonClick(object sender, RoutedEventArgs e)
+        {
+            var searchViewModel = this.DataContext as SearchViewModel;
+
+            // Clear SearchText in ViewModel, as result search textbox clears as well.
+            searchViewModel.SearchText = "";
+        }
+
         // Here we can move left, right, up, down.
         private void OnClassButtonKeyDown(object sender, KeyEventArgs e)
         {
@@ -63,7 +74,7 @@ namespace Dynamo.UI.Views
             e.Handled = true;
             return;
         }
-
+        
         private int GetIndexNextSelectedItem(Key key, int selectedIndex, int itemsPerRow)
         {
             int newIndex = -1;
