@@ -151,7 +151,6 @@ namespace Dynamo.UI.Views
                             }
                         }
                     }
-
         }
 
     }
