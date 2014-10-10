@@ -102,7 +102,7 @@ namespace Dynamo.Search
                 ClearSearchBox();
             }
         }
-               
+
         private void OnSearchBoxPreviewKeyDown(object sender, KeyEventArgs e)
         {
             bool handleIt = false;
