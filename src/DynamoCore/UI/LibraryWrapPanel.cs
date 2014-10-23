@@ -7,6 +7,7 @@ using Dynamo.Nodes.Search;
 using Dynamo.UI.Controls;
 using Dynamo.Utilities;
 using System.Windows.Input;
+using Dynamo.Search.SearchElements;
 
 namespace Dynamo.Controls
 {
@@ -19,6 +20,11 @@ namespace Dynamo.Controls
         private double classObjectWidth = double.NaN;
         private ObservableCollection<BrowserItem> collection;
         private BrowserInternalElement currentClass;
+
+        // For the first time we set current index to -2, because "-1" is used,
+        // when class button was clicked second time. And class button can also have "0" index.
+        // So, let's use "-2" as start value for currentIndex.
+        private int currentIndex = -2;
 
         protected override void OnInitialized(EventArgs e)
         {
@@ -34,10 +40,42 @@ namespace Dynamo.Controls
 
         private void OnLibraryWrapPanelKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            var classButton = Keyboard.FocusedElement as FrameworkElement;
+            var classButton = Keyboard.FocusedElement as ListBoxItem;
+
+            // Enter collapses and expands class button.
+            if (e.Key == Key.Enter)
+            {
+                classButton.IsSelected = !classButton.IsSelected;
+                e.Handled = true;
+                return;
+            }
 
             var buttonsWrapPanel = sender as LibraryWrapPanel;
             var listButtons = buttonsWrapPanel.Children;
+
+            // If focused element is NodeSearchElement, that means focused element is inside expanded class.
+            // If user presses Up, we have to move back to selected class.
+            if ((classButton.DataContext is NodeSearchElement) && (e.Key == Key.Up))
+            {
+                var selectedClassButton= listButtons.OfType<ListViewItem>().
+                    Where(button => button.IsSelected).FirstOrDefault();
+                if (selectedClassButton != null) selectedClassButton.Focus();
+                e.Handled = true;
+                return;
+            }
+
+            // If class is selected, we should move down to ClassDetails.
+            if ((e.Key == Key.Down) && classButton.IsSelected)
+            {
+                int classInfoIndex = GetClassInformationIndex();
+                var standardPanel = listButtons[classInfoIndex];
+                var firstMemberList = WPF.FindChild<ListBox>(standardPanel,"primaryMembers");
+                var generator = firstMemberList.ItemContainerGenerator;
+                (generator.ContainerFromIndex(0) as ListBoxItem).Focus();
+                
+                e.Handled = true;
+                return;
+            }
 
             var selectedIndex = listButtons.IndexOf(classButton);
             int itemsPerRow = (int)Math.Floor(buttonsWrapPanel.ActualWidth / classButton.ActualWidth);
@@ -167,6 +205,14 @@ namespace Dynamo.Controls
         private void OnClassViewSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var index = ((sender as ListView).SelectedIndex);
+
+            // Every time, when user moves inside class details, class button selects.
+            // As result class details repaints.
+            // So, we don't need to repaint it everytime, that's why we use cached index.
+            // If cached index equals current one, then we don't have to do anything.
+            if (currentIndex != index) currentIndex = index;
+            else return;
+
             int classInfoIndex = GetClassInformationIndex();
 
             // If user clicks on the same item when it is expanded, then 'OnClassButtonCollapse'
