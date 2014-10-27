@@ -1865,7 +1865,7 @@ namespace Dynamo.Controls
 
             var index = fullText.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase);
             if (index == -1)
-                return new Thickness(0, 0, textBlock.ActualWidth, textBlock.ActualHeight);
+                return new Thickness(0, 0, textBlock.ActualWidth, textBlock.ActualHeight*2);
 
             double leftMargin, rightMargin;
 
