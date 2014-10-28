@@ -144,6 +144,7 @@
         <controls:BrowserItemToBooleanConverter x:Key="BrowserItemToBooleanConverter" />
         <controls:NullValueToCollapsedConverter x:Key="NullValueToCollapsedConverter" />
         <controls:SearchHighlightMarginConverter x:Key="SearchHighlightMarginConverter" />
+        <controls:SearchHighlightClassMarginConverter x:Key="SearchHighlightClassMarginConverter" />
 
         <!--EndRegion-->
 
@@ -184,11 +185,13 @@
                                        HorizontalAlignment="Stretch"
                                        VerticalAlignment="Stretch">
                                 <Rectangle.Margin>
-                                    <MultiBinding Converter="{StaticResource SearchHighlightMarginConverter}">
+                                    <MultiBinding Converter="{StaticResource SearchHighlightClassMarginConverter}">
                                         <Binding ElementName="className" />
                                         <Binding Path="DataContext"
                                                  RelativeSource="{RelativeSource Mode=FindAncestor, 
                                                                      AncestorType={x:Type UserControl}}" />
+                                        <Binding Source="40" />
+                                        <Binding Source="90" />
                                     </MultiBinding>
                                 </Rectangle.Margin>
                             </Rectangle>
@@ -670,7 +673,7 @@
                                                         <TextBlock Text="{Binding Prefix}"
                                                                    Foreground="#989898"
                                                                    FontSize="12"
-                                                                   MouseLeftButtonDown="OnPrefixTextBlockMouseDown"/>
+                                                                   MouseLeftButtonDown="OnPrefixTextBlockMouseDown" />
                                                         <TextBlock Text="{Binding GroupName}"
                                                                    FontSize="12">
                                                             <TextBlock.Style>
