@@ -1920,7 +1920,8 @@ namespace Dynamo.Controls
             if (index == -1)
                 return new Thickness(0, 0, maxWidth, maxHeight);
 
-            double rightMargin = 0.0, leftMargin = 0.0, bottomMargin = textBlock.ActualHeight + 1;
+            double rightMargin = 0.0, leftMargin = 0.0, bottomMargin = textBlock.ActualHeight + 1,
+                topMargin = 0.0;
 
             var EOLIndex = fullText.IndexOf(EOL);
             if (EOLIndex == -1)
@@ -1934,6 +1935,7 @@ namespace Dynamo.Controls
                 double offset = 0.5 * (maxWidth - textBlock.ActualWidth);
                 rightMargin += offset;
                 leftMargin += offset;
+                return new Thickness(leftMargin, topMargin, rightMargin, bottomMargin);
             }
 
             if (index < EOLIndex)
@@ -1949,10 +1951,27 @@ namespace Dynamo.Controls
 
                 double offset = 0.5 * (maxWidth - lineWidth);
                 rightMargin += offset;
-                leftMargin += offset;                
+                leftMargin += offset;
             }
 
-            return new Thickness(leftMargin, 0, rightMargin, bottomMargin);
+            if (index > EOLIndex)
+            {
+                bottomMargin = 1;
+                topMargin = 18;
+                double lineWidth = ComputeTextWidth(fullText.Substring(EOLIndex + 1), typeface, textBlock);
+
+                rightMargin = lineWidth -
+                    ComputeTextWidth(fullText.Substring(EOLIndex + 1, index - EOLIndex - 1 + searchText.Length), typeface, textBlock);
+
+                leftMargin = lineWidth - rightMargin -
+                    ComputeTextWidth(fullText.Substring(index, searchText.Length), typeface, textBlock);
+
+                double offset = 0.5 * (maxWidth - lineWidth);
+                rightMargin += offset;
+                leftMargin += offset;
+            }
+
+            return new Thickness(leftMargin, topMargin, rightMargin, bottomMargin);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
