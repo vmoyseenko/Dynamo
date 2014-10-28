@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:controls="clr-namespace:Dynamo.Controls"
              xmlns:uicontrols="clr-namespace:Dynamo.UI.Controls"
              mc:Ignorable="d"
@@ -189,9 +190,17 @@
                                         <Binding ElementName="className" />
                                         <Binding Path="DataContext"
                                                  RelativeSource="{RelativeSource Mode=FindAncestor, 
-                                                                     AncestorType={x:Type UserControl}}" />
-                                        <Binding Source="90" />
-                                        <Binding Source="40" />
+                                                                                 AncestorType={x:Type UserControl}}" />
+                                        <Binding>
+                                            <Binding.Source>
+                                                <sys:Int32>90</sys:Int32>
+                                            </Binding.Source>
+                                        </Binding>
+                                        <Binding>
+                                            <Binding.Source>
+                                                <sys:Int32>40</sys:Int32>
+                                            </Binding.Source>
+                                        </Binding>
                                     </MultiBinding>
                                 </Rectangle.Margin>
                             </Rectangle>

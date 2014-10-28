@@ -1844,7 +1844,7 @@ namespace Dynamo.Controls
         }
     }
 
-    // Converter is used to specify Margin of highlight rectangle. 
+    // Converter is used to specify Margin of highlight rectangle for Member case. 
     // This rectangle highlights first instance of search phrase.
     //
     // Input parameters:
@@ -1864,8 +1864,10 @@ namespace Dynamo.Controls
             var fullText = textBlock.Text;
 
             var index = fullText.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase);
+            // Search phrase is not found in member name. Do not show highlight rectangle.
+            // 2 * textBlock.ActualHeight is used to be sure highlight rectangle won't be shown.
             if (index == -1)
-                return new Thickness(0, 0, textBlock.ActualWidth, textBlock.ActualHeight * 2);
+                return new Thickness(0, 0, textBlock.ActualWidth, 2 * textBlock.ActualHeight);
 
             double rightMargin = textBlock.ActualWidth -
                 ComputeTextWidth(fullText.Substring(0, index + searchText.Length), typeface, textBlock);
@@ -1894,12 +1896,14 @@ namespace Dynamo.Controls
         }
     }
 
-    // Converter is used to specify Margin of highlight rectangle. 
+    // Converter is used to specify Margin of highlight rectangle for Class case. 
     // This rectangle highlights first instance of search phrase.
     //
     // Input parameters:
     //     values[0] (TextBlock) - name of member. Part of this text rectangle should highlight.
     //     values[1] (SearchViewModel) - properties SearchText and RegularTypeface are used.
+    //     values[2] (int) - maximum possible width of text.
+    //     values[3] (int) - maximum possible height of text.
     public class SearchHighlightClassMarginConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -1910,13 +1914,14 @@ namespace Dynamo.Controls
             const char EOL = '\n';
             var textBlock = values[0] as TextBlock;
             var viewModel = values[1] as SearchViewModel;
-            var maxWidth = int.Parse(values[2] as string);
-            var maxHeight = int.Parse(values[3] as string);
+            var maxWidth = (int)values[2];
+            var maxHeight = (int)values[3];
             var searchText = viewModel.SearchText;
             var typeface = viewModel.RegularTypeface;
             var fullText = textBlock.Text;
 
             var index = fullText.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase);
+            // Search phrase is not found in class name. Do not show highlight rectangle.
             if (index == -1)
                 return new Thickness(0, 0, maxWidth, maxHeight);
 
@@ -1924,7 +1929,10 @@ namespace Dynamo.Controls
             double lineWidth = 0.0;
             string text;
 
+            // Generally class name can be broken to two lines.
+            // Here we are getting to know is it consist of two lines.
             var EOLIndex = fullText.IndexOf(EOL);
+            // Situation of one line.
             if (EOLIndex == -1)
             {
                 lineWidth = textBlock.ActualWidth;
@@ -1938,6 +1946,7 @@ namespace Dynamo.Controls
                 bottomMargin = textBlock.ActualHeight;
             }
 
+            // Situation of two lines. Search phrase is situated at top line.
             if (EOLIndex != -1 && index < EOLIndex)
             {
                 lineWidth = ComputeTextWidth(fullText.Substring(0, EOLIndex), typeface, textBlock);
@@ -1951,6 +1960,7 @@ namespace Dynamo.Controls
                 bottomMargin = Math.Round(0.5 * textBlock.ActualHeight);
             }
 
+            // Situation of two lines. Search phrase situated at bottom line.
             if (EOLIndex != -1 && index > EOLIndex)
             {
                 lineWidth = ComputeTextWidth(fullText.Substring(EOLIndex + 1), typeface, textBlock);
@@ -1964,9 +1974,10 @@ namespace Dynamo.Controls
                 topMargin = Math.Round(0.5 * textBlock.ActualHeight);
             }
 
+            // Class name text is centered. So we should shift left, right margins.
             double offset = 0.5 * (maxWidth - lineWidth);
-            rightMargin += offset;
             leftMargin += offset;
+            rightMargin += offset;
 
             return new Thickness(leftMargin, topMargin, rightMargin, bottomMargin);
         }
