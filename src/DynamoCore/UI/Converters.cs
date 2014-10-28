@@ -37,7 +37,7 @@ namespace Dynamo.Controls
             {
                 var trimIndex = tooltip.LastIndexOf(' ', MaxChars - 5);
                 return tooltip.Remove(trimIndex > 0 ? trimIndex : MaxChars - 5) + " ...";
-            } 
+            }
             return value;
         }
 
@@ -54,7 +54,7 @@ namespace Dynamo.Controls
         {
             if (value is PackageManagerSearchViewModel.PackageSearchState)
             {
-                var st = (PackageManagerSearchViewModel.PackageSearchState) value;
+                var st = (PackageManagerSearchViewModel.PackageSearchState)value;
 
                 if (st == PackageManagerSearchViewModel.PackageSearchState.NORESULTS)
                 {
@@ -134,9 +134,9 @@ namespace Dynamo.Controls
         public object Convert(object value, Type targetType, object parameter,
           CultureInfo culture)
         {
-            if (value is PackageDownloadHandle.State )
+            if (value is PackageDownloadHandle.State)
             {
-                var st = ( PackageDownloadHandle.State ) value;
+                var st = (PackageDownloadHandle.State)value;
 
                 if (st == PackageDownloadHandle.State.Downloaded)
                 {
@@ -158,7 +158,7 @@ namespace Dynamo.Controls
                 {
                     return "Installing";
                 }
-                else  if (st == PackageDownloadHandle.State.Uninitialized)
+                else if (st == PackageDownloadHandle.State.Uninitialized)
                 {
                     return "Starting";
                 }
@@ -274,7 +274,7 @@ namespace Dynamo.Controls
         {
             if (value is string && !string.IsNullOrEmpty(value as string))
             {
-                    return value as string;   
+                return value as string;
             }
 
             return ">";
@@ -305,11 +305,11 @@ namespace Dynamo.Controls
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is string && !string.IsNullOrEmpty(value as string) )
+            if (value is string && !string.IsNullOrEmpty(value as string))
             {
                 // convert to path, get file name
-                return Path.GetFileName((string) value);
-            } 
+                return Path.GetFileName((string)value);
+            }
 
             return "Unsaved";
         }
@@ -364,7 +364,7 @@ namespace Dynamo.Controls
         public Color HomeBackgroundColor { get; set; }
         public Color CustomBackgroundColor { get; set; }
 
-        public object Convert(object value, Type targetType, object parameter,CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             //parameter will contain a true or false
             //whether this is the home space
@@ -407,8 +407,8 @@ namespace Dynamo.Controls
 
     public class BooleanToBrushConverter : IValueConverter
     {
-        public SolidColorBrush TrueBrush{get;set;}
-        public SolidColorBrush FalseBrush{get;set;}
+        public SolidColorBrush TrueBrush { get; set; }
+        public SolidColorBrush FalseBrush { get; set; }
 
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
@@ -641,7 +641,7 @@ namespace Dynamo.Controls
             var rowColumn = parameter as string;
             if (rowColumn == null || (!rowColumn.Equals("Row") && (!rowColumn.Equals("Column"))))
             {
-                var message = "'AttachmentToRowColumnConverter' expects a " + 
+                var message = "'AttachmentToRowColumnConverter' expects a " +
                     "'ConverterParameter' value to be either 'Row' or 'Column'";
 
                 throw new ArgumentException(message);
@@ -986,7 +986,7 @@ namespace Dynamo.Controls
             PortType p = (PortType)value;
             if (p == PortType.INPUT)
             {
-                return new Rect(0,0,10,20);
+                return new Rect(0, 0, 10, 20);
             }
             else
             {
@@ -1469,13 +1469,13 @@ namespace Dynamo.Controls
         }
     }
 
-    public sealed class WarningLevelToColorConverter:IValueConverter
+    public sealed class WarningLevelToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is WarningLevel)
             {
-                var level = (WarningLevel) value;
+                var level = (WarningLevel)value;
                 switch (level)
                 {
                     case WarningLevel.Mild:
@@ -1499,9 +1499,9 @@ namespace Dynamo.Controls
     public class TabSizeConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {           
+        {
             TabControl tabControl = values[0] as TabControl;
-            
+
             double tabControlActualWidth = tabControl.ActualWidth - Configurations.TabControlMenuWidth; // Need to factor in tabControlMenu
 
             int visibleTabsNumber = tabControl.Items.Count;
@@ -1513,7 +1513,7 @@ namespace Dynamo.Controls
 
             if ((tabControlActualWidth - tabControl.Items.Count * Configurations.TabDefaultWidth) >= 0 || width > Configurations.TabDefaultWidth)
                 width = Configurations.TabDefaultWidth;
-            
+
             //Subtract 1, otherwise we could overflow to two rows.
             return (width <= Configurations.TabControlMenuWidth) ? Configurations.TabControlMenuWidth : (width - 1);
         }
@@ -1553,7 +1553,7 @@ namespace Dynamo.Controls
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var measure = (SIUnit) parameter;
+            var measure = (SIUnit)parameter;
             measure.SetValueFromString(value.ToString());
             return measure.Value;
         }
@@ -1563,11 +1563,11 @@ namespace Dynamo.Controls
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if ((bool) value != true) return "(Up-to-date)";
+            if ((bool)value != true) return "(Up-to-date)";
 
             var latest = UpdateManager.UpdateManager.Instance.AvailableVersion;
 
-            return latest != null? latest.ToString() : "Could not get version.";
+            return latest != null ? latest.ToString() : "Could not get version.";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -1582,11 +1582,11 @@ namespace Dynamo.Controls
         {
             SolidColorBrush brush;
 
-            brush = (bool) value
+            brush = (bool)value
                 ? (SolidColorBrush)
                     SharedDictionaryManager.DynamoColorsAndBrushesDictionary["UpdateManagerUpdateAvailableBrush"]
-                : (SolidColorBrush) SharedDictionaryManager.DynamoColorsAndBrushesDictionary["UpdateManagerUpToDateBrush"];
-                
+                : (SolidColorBrush)SharedDictionaryManager.DynamoColorsAndBrushesDictionary["UpdateManagerUpToDateBrush"];
+
             return brush;
         }
 
@@ -1865,7 +1865,7 @@ namespace Dynamo.Controls
 
             var index = fullText.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase);
             if (index == -1)
-                return new Thickness(0, 0, textBlock.ActualWidth, textBlock.ActualHeight*2);
+                return new Thickness(0, 0, textBlock.ActualWidth, textBlock.ActualHeight * 2);
 
             double rightMargin = textBlock.ActualWidth -
                 ComputeTextWidth(fullText.Substring(0, index + searchText.Length), typeface, textBlock);
@@ -1920,56 +1920,53 @@ namespace Dynamo.Controls
             if (index == -1)
                 return new Thickness(0, 0, maxWidth, maxHeight);
 
-            double rightMargin = 0.0, leftMargin = 0.0, bottomMargin = textBlock.ActualHeight + 1,
-                topMargin = 0.0;
+            double leftMargin = 0.0, topMargin = 0.0, rightMargin = 0.0, bottomMargin = 0.0;
+            double lineWidth = 0.0;
+            string text;
 
             var EOLIndex = fullText.IndexOf(EOL);
             if (EOLIndex == -1)
             {
-                rightMargin = textBlock.ActualWidth -
-                    ComputeTextWidth(fullText.Substring(0, index + searchText.Length), typeface, textBlock);
+                lineWidth = textBlock.ActualWidth;
 
-                leftMargin = textBlock.ActualWidth - rightMargin -
-                    ComputeTextWidth(fullText.Substring(index, searchText.Length), typeface, textBlock);
+                text = fullText.Substring(0, index + searchText.Length);
+                rightMargin = lineWidth - ComputeTextWidth(text, typeface, textBlock);
 
-                double offset = 0.5 * (maxWidth - textBlock.ActualWidth);
-                rightMargin += offset;
-                leftMargin += offset;
-                return new Thickness(leftMargin, topMargin, rightMargin, bottomMargin);
+                text = fullText.Substring(index, searchText.Length);
+                leftMargin = lineWidth - rightMargin - ComputeTextWidth(text, typeface, textBlock);
+
+                bottomMargin = textBlock.ActualHeight;
             }
 
-            if (index < EOLIndex)
+            if (EOLIndex != -1 && index < EOLIndex)
             {
-                bottomMargin = 0.5 * (textBlock.ActualHeight + 1) + 1;
-                double lineWidth = ComputeTextWidth(fullText.Substring(0, EOLIndex), typeface, textBlock);
+                lineWidth = ComputeTextWidth(fullText.Substring(0, EOLIndex), typeface, textBlock);
 
-                rightMargin = lineWidth -
-                    ComputeTextWidth(fullText.Substring(0, index + searchText.Length), typeface, textBlock);
+                text = fullText.Substring(0, index + searchText.Length);
+                rightMargin = lineWidth - ComputeTextWidth(text, typeface, textBlock);
 
-                leftMargin = lineWidth - rightMargin -
-                    ComputeTextWidth(fullText.Substring(index, searchText.Length), typeface, textBlock);
+                text = fullText.Substring(index, searchText.Length);
+                leftMargin = lineWidth - rightMargin - ComputeTextWidth(text, typeface, textBlock);
 
-                double offset = 0.5 * (maxWidth - lineWidth);
-                rightMargin += offset;
-                leftMargin += offset;
+                bottomMargin = Math.Round(0.5 * textBlock.ActualHeight);
             }
 
-            if (index > EOLIndex)
+            if (EOLIndex != -1 && index > EOLIndex)
             {
-                bottomMargin = 1;
-                topMargin = 18;
-                double lineWidth = ComputeTextWidth(fullText.Substring(EOLIndex + 1), typeface, textBlock);
+                lineWidth = ComputeTextWidth(fullText.Substring(EOLIndex + 1), typeface, textBlock);
 
-                rightMargin = lineWidth -
-                    ComputeTextWidth(fullText.Substring(EOLIndex + 1, index - EOLIndex - 1 + searchText.Length), typeface, textBlock);
+                text = fullText.Substring(EOLIndex + 1, index - EOLIndex - 1 + searchText.Length);
+                rightMargin = lineWidth - ComputeTextWidth(text, typeface, textBlock);
 
-                leftMargin = lineWidth - rightMargin -
-                    ComputeTextWidth(fullText.Substring(index, searchText.Length), typeface, textBlock);
+                text = fullText.Substring(index, searchText.Length);
+                leftMargin = lineWidth - rightMargin - ComputeTextWidth(text, typeface, textBlock);
 
-                double offset = 0.5 * (maxWidth - lineWidth);
-                rightMargin += offset;
-                leftMargin += offset;
+                topMargin = Math.Round(0.5 * textBlock.ActualHeight);
             }
+
+            double offset = 0.5 * (maxWidth - lineWidth);
+            rightMargin += offset;
+            leftMargin += offset;
 
             return new Thickness(leftMargin, topMargin, rightMargin, bottomMargin);
         }
