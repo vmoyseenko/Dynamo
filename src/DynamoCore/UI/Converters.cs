@@ -1907,6 +1907,7 @@ namespace Dynamo.Controls
             if (values.Length != 4)
                 return new ArgumentException();
 
+            const char EOL = '\n';
             var textBlock = values[0] as TextBlock;
             var viewModel = values[1] as SearchViewModel;
             var maxWidth = int.Parse(values[2] as string);
@@ -1919,13 +1920,23 @@ namespace Dynamo.Controls
             if (index == -1)
                 return new Thickness(0, 0, maxWidth, maxHeight);
 
-            double rightMargin = textBlock.ActualWidth -
-                ComputeTextWidth(fullText.Substring(0, index + searchText.Length), typeface, textBlock);
+            double rightMargin = 0.0, leftMargin = 0.0, bottomMargin = textBlock.ActualHeight + 1;
 
-            double leftMargin = textBlock.ActualWidth - rightMargin -
-                ComputeTextWidth(fullText.Substring(index, searchText.Length), typeface, textBlock);
+            var EOLIndex = fullText.IndexOf(EOL);
+            if (EOLIndex == -1)
+            {
+                rightMargin = textBlock.ActualWidth -
+                    ComputeTextWidth(fullText.Substring(0, index + searchText.Length), typeface, textBlock);
 
-            return new Thickness(leftMargin, 0, rightMargin, 0);
+                leftMargin = textBlock.ActualWidth - rightMargin -
+                    ComputeTextWidth(fullText.Substring(index, searchText.Length), typeface, textBlock);
+
+                double offset = 0.5 * (maxWidth - textBlock.ActualWidth);
+                rightMargin += offset;
+                leftMargin += offset;
+            }
+
+            return new Thickness(leftMargin, 0, rightMargin, bottomMargin);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

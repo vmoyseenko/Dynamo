@@ -190,8 +190,8 @@
                                         <Binding Path="DataContext"
                                                  RelativeSource="{RelativeSource Mode=FindAncestor, 
                                                                      AncestorType={x:Type UserControl}}" />
-                                        <Binding Source="40" />
                                         <Binding Source="90" />
+                                        <Binding Source="40" />
                                     </MultiBinding>
                                 </Rectangle.Margin>
                             </Rectangle>
@@ -238,7 +238,7 @@
                        Width="32"
                        Source="{Binding SmallIcon}" />
                 <Border Grid.Column="1"
-                        Margin="5,10,0,10">
+                        Margin="5,10,0,9">
                     <Rectangle Fill="#3E464C"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch">
