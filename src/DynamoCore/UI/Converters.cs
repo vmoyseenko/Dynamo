@@ -1936,6 +1936,22 @@ namespace Dynamo.Controls
                 leftMargin += offset;
             }
 
+            if (index < EOLIndex)
+            {
+                bottomMargin = 0.5 * (textBlock.ActualHeight + 1) + 1;
+                double lineWidth = ComputeTextWidth(fullText.Substring(0, EOLIndex), typeface, textBlock);
+
+                rightMargin = lineWidth -
+                    ComputeTextWidth(fullText.Substring(0, index + searchText.Length), typeface, textBlock);
+
+                leftMargin = lineWidth - rightMargin -
+                    ComputeTextWidth(fullText.Substring(index, searchText.Length), typeface, textBlock);
+
+                double offset = 0.5 * (maxWidth - lineWidth);
+                rightMargin += offset;
+                leftMargin += offset;                
+            }
+
             return new Thickness(leftMargin, 0, rightMargin, bottomMargin);
         }
 
