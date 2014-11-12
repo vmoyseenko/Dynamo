@@ -41,7 +41,10 @@ namespace Dynamo.Controls
 
         private void OnLibraryWrapPanelMouseDown(object sender, MouseButtonEventArgs e)
         {
-            e.Handled = true; 
+            var originalSender = (e.OriginalSource as FrameworkElement).DataContext;
+            if (originalSender is NodeSearchElement || originalSender is ClassInformation)
+                return;
+            e.Handled = true;
         }
 
         private void OnLibraryWrapPanelKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
