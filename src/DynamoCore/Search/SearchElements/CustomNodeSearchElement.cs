@@ -6,11 +6,17 @@ using System.Linq;
 using Dynamo.UI.Commands;
 using Dynamo.Utilities;
 using DynCmd = Dynamo.ViewModels.DynamoViewModel;
+using Greg;
+using Greg.Responses;
 
 namespace Dynamo.Search.SearchElements
 {
     public class CustomNodeSearchElement : NodeSearchElement, IEquatable<CustomNodeSearchElement>
     {
+        private static readonly string serverUrl = "https://www.dynamopackages.com/";
+        private XmlDocument xmlDoc = new XmlDocument();
+        private Client client = new Client(null, serverUrl);
+
         public Guid Guid { get; internal set; }
 
         private string _path;
@@ -20,6 +26,28 @@ namespace Dynamo.Search.SearchElements
             set { 
                 _path = value; 
                 RaisePropertyChanged("Path"); 
+            }
+        }
+
+        public string CurrentVersion
+        {
+            get 
+            { 
+                XmlNodeList workspace = xmlDoc.GetElementsByTagName("Workspace");
+                return workspace[0].Attributes["Version"].Value;
+            }
+        }
+
+        public string LastVersion
+        {
+            get
+            {
+                var packageHeader = new Greg.Requests.HeaderDownload("dynamo",Name);
+                var pkgResponse =
+                    client.ExecuteAndDeserializeWithContent<List<PackageHeader>>(packageHeader).
+                        content.FirstOrDefault();
+
+                return pkgResponse.versions.Last().version;
             }
         }
 
@@ -56,6 +84,11 @@ namespace Dynamo.Search.SearchElements
             this.ElementType = SearchModel.ElementType.CustomNode;
             this.Guid = info.Guid;
             this._path = info.Path;
+            try
+            {
+                xmlDoc.Load(info.Path);
+            }
+            catch{}
         }
 
         public override NodeSearchElement Copy()
@@ -102,8 +135,6 @@ namespace Dynamo.Search.SearchElements
 
             try
             {
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(Path);
                 XmlNodeList elNodes = xmlDoc.GetElementsByTagName("Elements");
 
                 if (elNodes.Count == 0)
