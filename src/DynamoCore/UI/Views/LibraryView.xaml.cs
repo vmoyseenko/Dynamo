@@ -42,6 +42,8 @@ namespace Dynamo.UI.Views
         private void OnClassButtonMouseUp(object sender, MouseButtonEventArgs e)
         {
             var classButton = sender as ListViewItem;
+            // ClassInformation cannot be selected or unselected.
+            // Just leave it.
             if (classButton == null || classButton.DataContext is ClassInformation) return;
 
             classButton.IsSelected = !classButton.IsSelected;
