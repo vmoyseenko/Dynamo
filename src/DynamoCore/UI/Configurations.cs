@@ -14,6 +14,7 @@ namespace Dynamo.UI
         public static readonly double IntegerSliderTextBoxWidth = 30.0;
         public static readonly double MaxWatchNodeWidth = 280.0;
         public static readonly double MaxWatchNodeHeight = 310.0;
+        public static readonly string ServerUrl = "https://www.dynamopackages.com/";
 
         #endregion
 

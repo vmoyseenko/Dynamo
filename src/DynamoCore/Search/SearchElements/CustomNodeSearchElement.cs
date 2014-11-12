@@ -13,9 +13,8 @@ namespace Dynamo.Search.SearchElements
 {
     public class CustomNodeSearchElement : NodeSearchElement, IEquatable<CustomNodeSearchElement>
     {
-        private static readonly string serverUrl = "https://www.dynamopackages.com/";
         private XmlDocument xmlDoc = new XmlDocument();
-        private Client client = new Client(null, serverUrl);
+        private Client client = new Client(null, Dynamo.UI.Configurations.ServerUrl);
 
         public Guid Guid { get; internal set; }
 

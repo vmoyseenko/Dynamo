@@ -113,12 +113,11 @@ namespace Dynamo.PackageManager
 
         #endregion
 
-        private static readonly string serverUrl = "https://www.dynamopackages.com/";
 
         public PackageManagerClient(DynamoModel dynamoModel)
         {
             this.dynamoModel = dynamoModel;
-            Client = new Client(null, serverUrl); 
+            Client = new Client(null, Dynamo.UI.Configurations.ServerUrl); 
         }
 
         //public bool IsNewestVersion(string packageId, string currentVersion, ref string newerVersion )
