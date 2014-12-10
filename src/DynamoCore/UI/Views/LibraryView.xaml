@@ -28,9 +28,11 @@
             <controls:BoolToScrollBarVisibilityConverter x:Key="BoolToScrollBarVisibilityConverter" />
             <controls:BrowserItemToBooleanConverter x:Key="BrowserItemToBooleanConverter" />
             <controls:RootElementToBoolConverter x:Key="RootElementToBoolConverter" />
+            <controls:BrowserInternalElementToBoolConverter x:Key="BrowserInternalElementToBoolConverter" />
             <!--Depending on the number of points in FullCategoryName margin will be done.-->
             <controls:FullCategoryNameToMarginConverter x:Key="FullCategoryNameToMarginConverter" />
             <controls:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
+            <controls:LibraryTreeItemsHostVisibilityConverter x:Key="LibraryTreeItemsHostVisibilityConverter" />
 
             <!--EndRegion-->
 
@@ -180,9 +182,9 @@
                            Name="SmallIcon" />
                     <TextBlock Name="memberName"
                                HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
                                Text="{Binding Name}"
-                               VerticalAlignment="Top"
-                               Margin="5,10,0,0"
+                               Margin="5,0,0,0"
                                Foreground="#989898"
                                FontSize="13" />
                     <StackPanel.Style>
@@ -309,7 +311,8 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type ListViewItem}">
-                                        <Border Background="{TemplateBinding Background}"
+                                        <Border Margin="0"
+                                                Background="{TemplateBinding Background}"
                                                 BorderBrush="Transparent"
                                                 BorderThickness="0">
                                             <ContentPresenter />
@@ -438,7 +441,7 @@
                 <Setter Property="Width"
                         Value="24" />
                 <Setter Property="Height"
-                        Value="Auto" />
+                        Value="{Binding Path=ActualHeight, RelativeSource={RelativeSource AncestorType=Grid}}" />
                 <Setter Property="Padding"
                         Value="0" />
                 <Setter Property="Margin"
@@ -449,7 +452,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ToggleButton}">
                             <Border x:Name="ExpanderButtonBorder">
-                                <Grid MinHeight="27"
+                                <Grid MinHeight="24"
                                       MinWidth="66">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
@@ -507,10 +510,10 @@
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
                                         <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Grid}, 
-                                                                         Path=IsMouseOver}"
+                                                                     Path=IsMouseOver}"
                                                    Value="False" />
                                         <Condition Binding="{Binding RelativeSource={RelativeSource Self}, 
-                                                                         Path=IsChecked}"
+                                                                     Path=IsChecked}"
                                                    Value="True" />
                                     </MultiDataTrigger.Conditions>
                                     <MultiDataTrigger.Setters>
@@ -556,8 +559,7 @@
                                         </Grid.RowDefinitions>
 
                                         <Border BorderBrush="#353535">
-                                            <Grid Background="Transparent"
-                                                  Grid.Row="0">
+                                            <Grid Background="Transparent">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="Auto" />
@@ -569,8 +571,7 @@
                                                     <RowDefinition Height="*" />
                                                 </Grid.RowDefinitions>
 
-                                                <ToggleButton Grid.Row="0"
-                                                              x:Name="Expander"
+                                                <ToggleButton x:Name="Expander"
                                                               Background="Transparent"
                                                               IsHitTestVisible="False"
                                                               Style="{StaticResource LibraryExpandCollapseToggleStyle}"
@@ -582,9 +583,9 @@
                                                     </ToggleButton.Margin>
                                                 </ToggleButton>
 
-                                                <ContentPresenter Grid.Row="0"
-                                                                  Grid.Column="1"
+                                                <ContentPresenter Grid.Column="1"
                                                                   Grid.ColumnSpan="2"
+                                                                  VerticalAlignment="Center"
                                                                   ContentSource="Header" />
 
                                                 <Grid.Style>
@@ -613,11 +614,11 @@
                                                             <MultiDataTrigger.Conditions>
                                                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self},
                                                                                      Path=IsMouseOver}"
-                                                                           Value="true" />
+                                                                           Value="True" />
                                                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self},
                                                                                      Path=DataContext,
                                                                                      Converter={StaticResource RootElementToBoolConverter}}"
-                                                                           Value="true" />
+                                                                           Value="True" />
                                                             </MultiDataTrigger.Conditions>
                                                             <MultiDataTrigger.Setters>
                                                                 <Setter Property="Background"
@@ -629,11 +630,11 @@
                                                             <MultiDataTrigger.Conditions>
                                                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self},
                                                                                      Path=IsMouseOver}"
-                                                                           Value="true" />
+                                                                           Value="True" />
                                                                 <Condition Binding="{Binding RelativeSource={RelativeSource Self},
                                                                                      Path=DataContext,
                                                                                      Converter={StaticResource RootElementToBoolConverter}}"
-                                                                           Value="false" />
+                                                                           Value="False" />
                                                             </MultiDataTrigger.Conditions>
                                                             <MultiDataTrigger.Setters>
                                                                 <Setter Property="Background"
@@ -641,7 +642,7 @@
                                                             </MultiDataTrigger.Setters>
                                                         </MultiDataTrigger>
 
-                                                        <DataTrigger Value="true">
+                                                        <DataTrigger Value="True">
                                                             <DataTrigger.Binding>
                                                                 <Binding RelativeSource="{RelativeSource Self}"
                                                                          Path="DataContext"
@@ -650,16 +651,29 @@
                                                             <Setter Property="BorderThickness"
                                                                     Value="0,0,0,1" />
                                                         </DataTrigger>
+
+                                                        <DataTrigger Value="True">
+                                                            <DataTrigger.Binding>
+                                                                <Binding RelativeSource="{RelativeSource Self}"
+                                                                         Path="DataContext"
+                                                                         Converter="{StaticResource BrowserInternalElementToBoolConverter}" />
+                                                            </DataTrigger.Binding>
+                                                            <Setter Property="Height"
+                                                                    Value="32" />
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
                                         </Border>
 
-                                        <Border Grid.Column="0"
-                                                Grid.Row="1"
+                                        <Border Grid.Row="1"
                                                 Background="#2F2F2F">
                                             <ItemsPresenter x:Name="ItemsHost"
-                                                            Margin="0,10,0,0" />
+                                                            Margin="0,3,0,3">
+                                                <ItemsPresenter.Visibility>
+                                                    <Binding Converter="{StaticResource LibraryTreeItemsHostVisibilityConverter}" />
+                                                </ItemsPresenter.Visibility>
+                                            </ItemsPresenter>
                                         </Border>
                                     </Grid>
                                     <Border.Style>
@@ -678,7 +692,7 @@
                                                     <Setter Property="Background"
                                                             Value="#2F2F2F" />
                                                     <Setter Property="Padding"
-                                                            Value="0,0,0,10" />
+                                                            Value="0,0,0,0" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -712,7 +726,7 @@
                                     <Setter Property="Background"
                                             Value="#2F2F2F" />
                                     <Setter Property="Padding"
-                                            Value="0,0,0,10" />
+                                            Value="0,0,0,3" />
                                 </DataTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
