@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Dynamo.Core;
+using Dynamo.DSEngine;
 using Dynamo.Models;
 using System.Reflection;
 using System.IO;
@@ -36,8 +37,38 @@ namespace Dynamo.Utilities
         private static string _dynamoDirectory = "";
         public static HashSet<string> SearchPaths = new HashSet<string>();
         public static HashSet<string> LoadedAssemblyNames = new HashSet<string>();
+        public static HashSet<Assembly> LoadedAssemblies = new HashSet<Assembly>();
         public static Dictionary<string, List<Type>> AssemblyPathToTypesLoaded =
             new Dictionary<string, List<Type>>();
+
+       
+        #endregion
+
+        #region Events
+
+        public delegate void AssemblyLoadedHandler(AssemblyLoadedEventArgs args);
+
+        public class AssemblyLoadedEventArgs
+        {
+            public Assembly Assembly { get; private set; }
+
+            public AssemblyLoadedEventArgs(Assembly assembly)
+            {
+                this.Assembly = assembly;
+            }
+        }
+
+        public event AssemblyLoadedHandler AssemblyLoaded;
+
+        private void OnAssemblyLoaded(Assembly assem)
+        {
+            LoadedAssemblies.Add(assem);
+
+            if (AssemblyLoaded != null)
+            {
+                AssemblyLoaded(new AssemblyLoadedEventArgs(assem));
+            }
+        }
 
         #endregion
 
@@ -48,6 +79,7 @@ namespace Dynamo.Utilities
         }
 
         #region Methods
+
 
         /// <summary>
         /// Load all types which inherit from NodeModel whose assemblies are located in
@@ -257,6 +289,8 @@ namespace Dynamo.Utilities
                             dynamoModel.BuiltInTypesByName.Add(t.FullName, data);
                         else
                             dynamoModel.Logger.Log("Duplicate type encountered: " + typeName);
+
+                        
                     }
                     catch (Exception e)
                     {
@@ -265,6 +299,7 @@ namespace Dynamo.Utilities
                         dynamoModel.Logger.Log(e);
                     }
 
+                    OnAssemblyLoaded(assembly);
                 }
             }
             catch (Exception e)
@@ -284,6 +319,8 @@ namespace Dynamo.Utilities
                     }
                 }
             }
+
+            
 
             return AssemblyPathToTypesLoaded[assembly.Location];
         }
@@ -310,7 +347,7 @@ namespace Dynamo.Utilities
         /// <summary>
         ///     Load Custom Nodes from the CustomNodeLoader search path and update search
         /// </summary>
-        public List<CustomNodeInfo> LoadCustomNodes(string path)
+        public List<CustomNodeInfo> LoadCustomNodes(string path, SearchModel.ElementType elementType)
         {
             if (!Directory.Exists(path))
                 return new List<CustomNodeInfo>();
@@ -321,7 +358,11 @@ namespace Dynamo.Utilities
             var loadedNodes = customNodeLoader.ScanNodeHeadersInDirectory(path).ToList();
             
             // add nodes to search
-            loadedNodes.ForEach(x => searchModel.Add(x));
+            loadedNodes.ForEach(x =>
+            {
+                x.ElementType = elementType;
+                searchModel.Add(x);
+            });
 
             // update search view
             searchModel.OnRequestSync();

@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
-using Dynamo.DSEngine;
+using System.Collections.ObjectModel;
+using Dynamo.Core;
 using Dynamo.Models;
 using Dynamo.Nodes;
-using Dynamo.Nodes.Search;
 using Dynamo.Search.SearchElements;
-using Dynamo.UI;
 using Dynamo.Utilities;
-using Microsoft.Practices.Prism.ViewModel;
-using System.IO;
+using Dynamo.DSEngine;
+
 using System.Xml;
 using DynamoUtilities;
+using Dynamo.UI;
 
 namespace Dynamo.Search
 {
@@ -284,11 +283,7 @@ namespace Dynamo.Search
 
         internal ElementType GetElementType(BrowserInternalElement item)
         {
-            //TODO: Add check if item is loaded as part of package
-            if (item is CustomNodeSearchElement)
-                return ElementType.CustomNode;
-
-            if (item is DSFunctionNodeSearchElement || item is NodeSearchElement)
+            if (item is NodeSearchElement)
                 return (item as NodeSearchElement).ElementType;
 
             return ElementType.Regular;
@@ -309,7 +304,7 @@ namespace Dynamo.Search
             {
                 splitCat =
                     categoryName.Split(Configurations.CategoryDelimiter)
-                                .Where(x => x != Configurations.CategoryDelimiter.ToString() && !System.String.IsNullOrEmpty(x))
+                                .Where(x => x != Configurations.CategoryDelimiter.ToString() && !string.IsNullOrEmpty(x))
                                 .ToList();
             }
             else
@@ -341,6 +336,34 @@ namespace Dynamo.Search
         internal void SortSearchCategoriesChildren()
         {
             _searchRootCategories.ToList().ForEach(x => x.SortChildren());
+        }
+
+        internal static string ShortenCategoryName(string fullCategoryName)
+        {
+            if (string.IsNullOrEmpty(fullCategoryName))
+                return string.Empty;
+
+            var catName = fullCategoryName.Replace(Configurations.CategoryDelimiter.ToString(), " " + Configurations.ShortenedCategoryDelimiter + " ");
+
+            // if the category name is too long, we strip off the interior categories
+            if (catName.Length > 50)
+            {
+                var s = catName.Split(Configurations.ShortenedCategoryDelimiter).Select(x => x.Trim()).ToList();
+                if (s.Count() > 4)
+                {
+                    s = new List<string>()
+                                        {
+                                            s[0],
+                                            "...",
+                                            s[s.Count - 3],
+                                            s[s.Count - 2],
+                                            s[s.Count - 1]
+                                        };
+                    catName = String.Join(" " + Configurations.ShortenedCategoryDelimiter + " ", s);
+                }
+            }
+
+            return catName;
         }
 
         #endregion
@@ -520,6 +543,7 @@ namespace Dynamo.Search
                 return this.Refactor(nodeInfo);
             }
 
+            nodeEle.ElementType = nodeInfo.ElementType;
             nodeEle.Executed += this.OnExecuted;
 
             SearchDictionary.Add(nodeEle, nodeEle.Name);
