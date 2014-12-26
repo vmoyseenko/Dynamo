@@ -187,6 +187,8 @@ namespace Dynamo.UI.Views
             {
                 (HighlightedItem as ListBoxItem).IsSelected = true;
                 ShowTooltip(HighlightedItem as ListBoxItem);
+
+                WpfUtilities.IsControlUserVisible(HighlightedItem, ScrollLibraryViewer);
             }
         }
 
