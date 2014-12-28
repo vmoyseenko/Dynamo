@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -14,6 +17,10 @@ namespace Dynamo.UI.Views
     /// </summary>
     public partial class LibrarySearchView : UserControl
     {
+        private enum MoveDirection { Undefined, Down, Up };
+
+        private const int NextMembersMaxNumber = 5;
+
         private ListBoxItem HighlightedItem;
 
         public LibrarySearchView()
@@ -132,7 +139,7 @@ namespace Dynamo.UI.Views
 
         private void OnListBoxItemMouseEnter(object sender, MouseEventArgs e)
         {
-            UpdateHighlightedItem(null);
+            UpdateHighlightedItem(null, MoveDirection.Undefined);
             ShowTooltip(sender);
         }
 
@@ -171,7 +178,7 @@ namespace Dynamo.UI.Views
         // When element can't move further, it notifies its' parent about that.
         // And then parent decides what to do with it.
 
-        private void UpdateHighlightedItem(ListBoxItem newItem)
+        private void UpdateHighlightedItem(ListBoxItem newItem, MoveDirection direction)
         {
             if (HighlightedItem == newItem)
                 return;
@@ -188,8 +195,112 @@ namespace Dynamo.UI.Views
                 (HighlightedItem as ListBoxItem).IsSelected = true;
                 ShowTooltip(HighlightedItem as ListBoxItem);
 
-                WpfUtilities.IsControlUserVisible(HighlightedItem, ScrollLibraryViewer);
+                if (!WpfUtilities.IsControlUserVisible(HighlightedItem, ScrollLibraryViewer, ignoreWidth: true))
+                    ShowNextMembers(direction);
             }
+        }
+
+        private void ShowNextMembers(MoveDirection direction)
+        {
+            // Only down direction is supported.
+            if (direction != MoveDirection.Down)
+                return;
+
+            var element = HighlightedItem.DataContext as NodeSearchElement;
+            var categories = (CategoryListView.DataContext as SearchViewModel).SearchRootCategories;
+
+            // Find out coordinates of currently selected item.
+            // scIndex - index of Search Category to which element belongs to
+            // mgIndex - index of MemberGroup to which element belongs to
+            // elIndex - index of element in alist of Members
+            int scIndex = -1, mgIndex = -1, elIndex = -1;
+            var searchCategory = categories.FirstOrDefault(sc =>
+            {
+                var foundMemberGroup = sc.MemberGroups.FirstOrDefault(mg =>
+                    {
+                        if (mg.Members.Contains(element))
+                        {
+                            elIndex = mg.Members.TakeWhile(mem => mem != element).Count();
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    });
+                if (foundMemberGroup == null)
+                    return false;
+
+                mgIndex = sc.MemberGroups.TakeWhile(mg => mg != foundMemberGroup).Count();
+                return true;
+            });
+
+            scIndex = categories.IndexOf(searchCategory);
+
+            // Find out coordinates of member to which LibrarySearchView should be scrolled.
+            int scfIndex = scIndex, mgfIndex = mgIndex, elfIndex = elIndex;
+            int foundMembersCount = 0;
+            int membersToFindCount = NextMembersMaxNumber;
+            // Count next after highlighted members in the list of members.
+            int difference = categories[scIndex].MemberGroups.ElementAt(mgIndex).Members.Count() - 1 - elIndex;
+            if (difference >= membersToFindCount)
+            {
+                foundMembersCount = membersToFindCount;
+                elfIndex = elIndex + membersToFindCount;
+                membersToFindCount = 0;
+            }
+            else
+            {
+                foundMembersCount += difference;
+                membersToFindCount -= difference;
+            }
+
+            // Count members of next Search Categories and MemberGroups until we not found 
+            // necessary number of elements.
+            while (scfIndex < categories.Count && membersToFindCount > 0)
+            {
+                mgfIndex++;
+                while (mgfIndex < categories[scfIndex].MemberGroups.Count())
+                {
+                    difference = categories[scfIndex].MemberGroups.ElementAt(mgfIndex).Members.Count();
+                    if (difference >= membersToFindCount)
+                    {
+                        foundMembersCount += membersToFindCount;
+                        elfIndex = membersToFindCount - 1;
+                        membersToFindCount = 0;
+                        break;
+                    }
+                    else
+                    {
+                        foundMembersCount += difference;
+                        membersToFindCount -= difference;
+                    }
+
+                    mgfIndex++;
+                }
+
+                if (membersToFindCount == 0)
+                    break;
+
+                // It is latest Search Category.
+                // Let's fix indexes before exit from loop.
+                if (scfIndex == categories.Count - 1)
+                {
+                    mgfIndex--;
+                    elfIndex = 0;
+                    break;
+                }
+
+                mgfIndex = -1;
+                scfIndex++;
+            }
+
+            // Scroll to member with new coordinates. For it get ListBoxItem of it.
+            var listBox = WpfUtilities.ChildOfType<ListBox>(GetListItemByIndex(CategoryListView, scfIndex), "MemberGroupsListBox");
+            listBox = WpfUtilities.ChildOfType<ListBox>(GetListItemByIndex(listBox, mgfIndex));
+
+            var itemToShow = GetListItemByIndex(listBox, elfIndex);
+            itemToShow.BringIntoView();
         }
 
         // Generates keydown event on currently selected item.
@@ -241,6 +352,7 @@ namespace Dynamo.UI.Views
         // This event is used to move inside members.
         private void OnMembersListBoxKeyDown(object sender, KeyEventArgs e)
         {
+            var direction = KeyToDirection(e.Key);
             var selectedMember = HighlightedItem.DataContext as BrowserInternalElement;
             var membersListBox = sender as ListBox;
             var members = membersListBox.Items;
@@ -257,15 +369,15 @@ namespace Dynamo.UI.Views
             }
 
             int nextselectedMemberIndex = selectedMemberIndex;
-            if (e.Key == Key.Down)
+            if (direction == MoveDirection.Down)
                 nextselectedMemberIndex++;
-            if (e.Key == Key.Up)
+            if (direction == MoveDirection.Up)
                 nextselectedMemberIndex--;
 
             if (nextselectedMemberIndex < 0 || nextselectedMemberIndex > members.Count - 1)
                 return;
 
-            UpdateHighlightedItem(GetListItemByIndex(membersListBox, nextselectedMemberIndex));
+            UpdateHighlightedItem(GetListItemByIndex(membersListBox, nextselectedMemberIndex), direction);
             e.Handled = true;
 
         }
@@ -274,7 +386,8 @@ namespace Dynamo.UI.Views
         // I.e. we are now at the last member button and we have to move to next member group.
         private void MemberGroupsKeyDown(object sender, KeyEventArgs e)
         {
-            if ((e.Key != Key.Down) && (e.Key != Key.Up))
+            var direction = KeyToDirection(e.Key);
+            if (direction == MoveDirection.Undefined)
                 return;
 
             var selectedMember = HighlightedItem.DataContext as BrowserInternalElement;
@@ -297,9 +410,9 @@ namespace Dynamo.UI.Views
             int nextSelectedMemberGroupIndex = selectedMemberGroupIndex;
             // If user presses down, then we need to set focus to the next member group.
             // Otherwise to previous.
-            if (e.Key == Key.Down)
+            if (direction == MoveDirection.Down)
                 nextSelectedMemberGroupIndex++;
-            if (e.Key == Key.Up)
+            if (direction == MoveDirection.Up)
                 nextSelectedMemberGroupIndex--;
 
             // The member group list box does not attempt to process the key event if it 
@@ -322,7 +435,7 @@ namespace Dynamo.UI.Views
                 itemIndex = nextSelectedMembers.Items.Count - 1;
 
 
-            UpdateHighlightedItem(GetListItemByIndex(nextSelectedMembers, itemIndex));
+            UpdateHighlightedItem(GetListItemByIndex(nextSelectedMembers, itemIndex), direction);
 
             e.Handled = true;
         }
@@ -334,7 +447,8 @@ namespace Dynamo.UI.Views
         // responsibility to move the selection on to the adjacent list box.
         private void OnCategoryContentKeyDown(object sender, KeyEventArgs e)
         {
-            if ((e.Key != Key.Down) && (e.Key != Key.Up))
+            var direction = KeyToDirection(e.Key);
+            if (direction == MoveDirection.Undefined)
                 return;
 
             // Selected member(in this scenario) can be only first/last member button or first/last class button.
@@ -349,7 +463,7 @@ namespace Dynamo.UI.Views
                 // Gotten here because of last method being listed, pressing 'down' array cannot 
                 // move down further. Return here to allow higher level visual element to handle
                 // the navigation (to a separate category).
-                if (e.Key == Key.Down)
+                if (direction == MoveDirection.Down)
                     return;
 
                 // Otherwise, pressed Key is Up.
@@ -376,7 +490,7 @@ namespace Dynamo.UI.Views
             {
                 // We are at the first row of class list. User presses up, we have to move to previous category.
                 // We handle it further.
-                if (e.Key == Key.Up)
+                if (direction == MoveDirection.Up)
                     return;
 
                 // Otherwise user pressed down, we have to move to first member button.
@@ -384,7 +498,7 @@ namespace Dynamo.UI.Views
                 var listItem = FindFirstChildListItem(memberGroupsListBox, "MembersListBox");
                 if (listItem != null)
                 {
-                    UpdateHighlightedItem(listItem);
+                    UpdateHighlightedItem(listItem, direction);
                 }
 
                 e.Handled = true;
@@ -414,7 +528,8 @@ namespace Dynamo.UI.Views
         /// </summary>
         private void OnCategoryKeyDown(object sender, KeyEventArgs e)
         {
-            if ((e.Key != Key.Down) && (e.Key != Key.Up))
+            var direction = KeyToDirection(e.Key);
+            if (direction == MoveDirection.Undefined)
                 return;
 
             // Selected member(in this scenario) can be only first/last member button or class button at the first row.
@@ -433,9 +548,9 @@ namespace Dynamo.UI.Views
                 }
             }
 
-            if (e.Key == Key.Down)
+            if (direction == MoveDirection.Down)
                 categoryIndex++;
-            if (e.Key == Key.Up)
+            if (direction == MoveDirection.Up)
                 categoryIndex--;
 
             // The selection cannot be moved further up, returning here without handling the key event 
@@ -450,14 +565,14 @@ namespace Dynamo.UI.Views
 
             var nextSelectedCategory = GetListItemByIndex(categoryListView, categoryIndex);
 
-            if (e.Key == Key.Up)
+            if (direction == MoveDirection.Up)
             {
                 var memberGroupsList = WpfUtilities.ChildOfType<ListBox>(nextSelectedCategory, "MemberGroupsListBox");
                 var lastMemberGroup = GetListItemByIndex(memberGroupsList, memberGroupsList.Items.Count - 1);
                 var membersList = WpfUtilities.ChildOfType<ListBox>(lastMemberGroup, "MembersListBox");
 
                 // If key is up, then we have to select the last method button.
-                UpdateHighlightedItem(GetListItemByIndex(membersList, membersList.Items.Count - 1));
+                UpdateHighlightedItem(GetListItemByIndex(membersList, membersList.Items.Count - 1), direction);
             }
             else // Otherwise, Down was pressed, and we have to select first class/method button.
             {
@@ -476,7 +591,7 @@ namespace Dynamo.UI.Views
 #else
                 // If there are no classes, then focus on first method.
                 var memberGroupsList = FindFirstChildListItem(nextSelectedCategory, "MemberGroupsListBox");
-                UpdateHighlightedItem(FindFirstChildListItem(memberGroupsList, "MembersListBox"));
+                UpdateHighlightedItem(FindFirstChildListItem(memberGroupsList, "MembersListBox"), direction);
 #endif
             }
             e.Handled = true;
@@ -493,13 +608,14 @@ namespace Dynamo.UI.Views
         /// </summary>
         private void OnMainGridKeyDown(object sender, KeyEventArgs e)
         {
-            if ((e.Key != Key.Down) && (e.Key != Key.Up))
+            var direction = KeyToDirection(e.Key);
+            if (direction == MoveDirection.Undefined)
                 return;
             var librarySearchViewElement = sender as FrameworkElement;
 
             // We are at the top result. If down was pressed, 
             // that means we have to move to first class/method button.
-            if (e.Key == Key.Down)
+            if (direction == MoveDirection.Down)
             {
                 //Unselect top result.
                 if (e.OriginalSource is ListBox)
@@ -518,11 +634,11 @@ namespace Dynamo.UI.Views
 #endif
                 // Otherwise, set selection on the first method button.
                 var firstMemberGroup = FindFirstChildListItem(firstCategory, "MemberGroupsListBox");
-                UpdateHighlightedItem(FindFirstChildListItem(firstMemberGroup, "MembersListBox"));
+                UpdateHighlightedItem(FindFirstChildListItem(firstMemberGroup, "MembersListBox"), direction);
             }
             else // Otherwise, Up was pressed. So, we have to move to top result.
             {
-                UpdateHighlightedItem(FindFirstChildListItem(this, "topResultListBox"));
+                UpdateHighlightedItem(FindFirstChildListItem(this, "topResultListBox"), direction);
             }
 
             e.Handled = true;
@@ -548,7 +664,7 @@ namespace Dynamo.UI.Views
                 Dynamo.ViewModels.SearchViewModel.ViewMode.LibrarySearchView)
             {
                 libraryToolTipPopup.DataContext = null;
-                UpdateHighlightedItem(null);
+                UpdateHighlightedItem(null, MoveDirection.Undefined);
                 return;
             }
             if (sender is ListBox)
@@ -558,6 +674,24 @@ namespace Dynamo.UI.Views
                 libraryToolTipPopup.PlacementTarget = topResultListBox;
                 libraryToolTipPopup.SetDataContext(topResultListBox.SelectedItem);
             }
+        }
+
+        private MoveDirection KeyToDirection(Key key)
+        {
+            MoveDirection direction;
+            switch (key)
+            {
+                case Key.Down:
+                    direction = MoveDirection.Down;
+                    break;
+                case Key.Up:
+                    direction = MoveDirection.Up;
+                    break;
+                default:
+                    direction = MoveDirection.Undefined;
+                    break;
+            }
+            return direction;
         }
 
         #endregion
