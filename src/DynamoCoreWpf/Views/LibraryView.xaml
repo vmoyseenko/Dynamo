@@ -221,7 +221,7 @@
                         <RowDefinition Height="40" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="64" />
+                        <ColumnDefinition Width="72" />
                     </Grid.ColumnDefinitions>
                     <Image Width="32"
                            Height="32"
@@ -234,7 +234,9 @@
                                    VerticalAlignment="Top"
                                    TextAlignment="Center"
                                    Foreground="#989898"
-                                   FontSize="13">
+                                   FontSize="13"
+                                   LineStackingStrategy="BlockLineHeight"
+                                   LineHeight="14">
                             <TextBlock.Text>
                                 <Binding Path="Model.Name"
                                          Converter="{StaticResource FullyQualifiedNameToDisplayConverter}"
