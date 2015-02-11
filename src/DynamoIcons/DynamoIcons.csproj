@@ -35,7 +35,6 @@
     <EmbeddedResource Include="UnitsUIImages.resx" />
     <EmbeddedResource Include="DynamoCoreImages.resx" />
     <EmbeddedResource Include="DynamoWatch3DImages.resx" />
-    <EmbeddedResource Include="DSCoreNodesUIImages.resx" />
     <EmbeddedResource Include="DSCoreNodesImages.resx" />
     <EmbeddedResource Include="DSIronPythonNodeImages.resx" />
     <EmbeddedResource Include="DSOfficeImages.resx" />
@@ -49,8 +48,6 @@
     </GetReferenceAssemblyPaths>
     <GenerateResource UseSourcePath="true" Sources="$(ProjectDir)DSCoreNodesImages.resx" OutputResources="$(ProjectDir)DSCoreNodesImages.resources" References="$(FrameworkAssembliesPath)System.Drawing.dll" />
     <AL TargetType="library" EmbedResources="$(ProjectDir)DSCoreNodesImages.resources" OutputAssembly="$(OutDir)DSCoreNodes.resources.dll" />
-    <GenerateResource UseSourcePath="true" Sources="$(ProjectDir)DSCoreNodesUIImages.resx" OutputResources="$(ProjectDir)DSCoreNodesUIImages.resources" References="$(FrameworkAssembliesPath)System.Drawing.dll" />
-    <AL TargetType="library" EmbedResources="$(ProjectDir)DSCoreNodesUIImages.resources" OutputAssembly="$(OutDir)DSCoreNodesUI.resources.dll" />
     <GenerateResource UseSourcePath="true" Sources="$(ProjectDir)DSOfficeImages.resx" OutputResources="$(ProjectDir)DSOfficeImages.resources" References="$(FrameworkAssembliesPath)System.Drawing.dll" />
     <AL TargetType="library" EmbedResources="$(ProjectDir)DSOfficeImages.resources" OutputAssembly="$(OutDir)DSOffice.resources.dll" />
     <GenerateResource UseSourcePath="true" Sources="$(ProjectDir)DSIronPythonNodeImages.resx" OutputResources="$(ProjectDir)DSIronPythonNodeImages.resources" References="$(FrameworkAssembliesPath)System.Drawing.dll" />
@@ -73,7 +70,7 @@
   <Target Name="AfterBuild">
     <ItemGroup>
       <DeleteFiles Include="$(TargetDir)$(ProjectName).*" />
-    </ItemGroup>    
-	<Delete Files="@(DeleteFiles)" />
+    </ItemGroup>
+    <Delete Files="@(DeleteFiles)" />
   </Target>
 </Project>

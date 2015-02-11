@@ -74,7 +74,7 @@ namespace DynamoUtilities
         /// <summary>
         /// The Dynamo folder in AppData
         /// </summary>
-        public string AppData { get; private set;}
+        public string AppData { get; private set; }
 
         public string GeometryFactory { get; private set; }
 
@@ -158,6 +158,8 @@ namespace DynamoUtilities
 
             // Only register the core nodes directory
             Nodes.Add(Path.Combine(MainExecPath, "nodes"));
+            // Add path for icon resources
+            AddResolutionPath(Path.Combine(MainExecPath, "nodes", UICulture));
 
 #if DEBUG
             var sb = new StringBuilder();
@@ -165,8 +167,8 @@ namespace DynamoUtilities
             sb.AppendLine(String.Format("Definitions: {0}", UserDefinitions));
             sb.AppendLine(String.Format("Packages: {0}", Packages));
             sb.AppendLine(String.Format("Asm: {0}", LibG));
-            Nodes.ToList().ForEach(n=>sb.AppendLine(String.Format("Nodes: {0}", n)));
-            
+            Nodes.ToList().ForEach(n => sb.AppendLine(String.Format("Nodes: {0}", n)));
+
             Debug.WriteLine(sb);
 #endif
             var coreLibs = new List<string>

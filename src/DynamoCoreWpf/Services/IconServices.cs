@@ -63,7 +63,15 @@ namespace Dynamo.Wpf.Services
                 return null;
             }
 
-            ResourceManager rm = new ResourceManager(assemblyName + imagesSuffix, resourceAssembly);
+            var baseName = assemblyName + imagesSuffix;
+            ResourceManager rm = new ResourceManager(baseName, resourceAssembly);
+            if (baseName.Contains("DSCoreNodesUI"))
+            {
+                baseName = "Resources";
+
+                //var types = resourceAssembly.GetTypes();
+                rm = new ResourceManager(baseName, resourceAssembly);
+            }
 
             ImageSource bitmapSource = null;
 
